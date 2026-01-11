@@ -1,8 +1,10 @@
 FROM steamcmd/steamcmd:latest
 
-ARG APP_CODE
+RUN dpkg --add-architecture i386 && apt-get update
+RUN apt-get install -y libstdc++6:i386 libgcc1:i386 libcurl4-gnutls-dev
+RUN steamcmd +login anonymous +app_update 343050 +quit
 
-RUN steamcmd +login anonymous +app_update ${APP_CODE} +quit
+COPY ./data/start_server.sh /root/
 
-ENTRYPOINT []
-CMD ["/bin/sh"]
+ENTRYPOINT ["/root/start_server.sh"]
+CMD [""]
