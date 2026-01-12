@@ -3,7 +3,7 @@
 ## Build
 
 ```sh
-podman build --tag dst:latest .
+podman build --tag dst:latest --format docker .
 ```
 
 ## Server configuration setup
