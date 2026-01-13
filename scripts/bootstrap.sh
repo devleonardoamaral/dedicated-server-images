@@ -6,7 +6,9 @@ DST="/srv/data"
 
 mkdir -p "$DST"
 
-mv -n "$SRC"/* "$DST"/
-mv -f "$SRC"/HytaleServer.jar "$DST"/
+for f in "$SRC"/*; do
+    rm -rf "$DST/$(basename "$f")"
+    mv "$f" "$DST"/
+done
 
 exec "$@"
