@@ -1,6 +1,16 @@
-# SteamCMD Dedicated Servers Containers
+# Hytale Dedicated Server
 
-This repository contains images to host dedicated game servers. You can access a specific image from the list below or by switching the repository branch.
+# Build
 
-- [Don‘t Starve Together](https://github.com/devleonardoamaral/steamcmd-containers/tree/dont-starve-together)
-- [Valheim](https://github.com/devleonardoamaral/steamcmd-containers/tree/valheim)
+```sh
+podman build --tag hytale:latest --format docker .
+```
+
+# Create container
+
+```sh
+podman create -ti --name hytale-server \
+    -p 5520:5520/udp \
+    -v ./data:/srv/data \
+    hytale:latest
+```
