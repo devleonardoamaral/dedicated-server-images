@@ -1,4 +1,4 @@
-# Dedicated Servers Images
+# Dedicated Server Images
 
 This repository contains images to host dedicated game servers. You can access a specific image from the list below or by switching the repository branch.
 
