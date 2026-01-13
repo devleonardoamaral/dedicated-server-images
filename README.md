@@ -20,8 +20,8 @@ The container expects the standard Klei layout (clusters/worlds) inside `./data`
 To add mods to the server you need setup the files `./mods/dedicated_server_mods_setup.lua` and `./mods/modoverrides.lua`. After setup both files, copy `./mods/modoverrides.lua` to the following folders:
 
 ```sh
-cp ./mods/modoverrides.lua ./data/Master
-cp ./mods/modoverrides.lua ./data/Caves
+cp ./mods/modoverrides.lua ./data/Master/
+cp ./mods/modoverrides.lua ./data/Caves/
 ```
 
 > The build process automatically copies `./mods/dedicated_server_mods_setup.lua` into the image, so no manual placement is required.
