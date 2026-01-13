@@ -11,7 +11,7 @@ podman build --tag dst:latest --format docker .
 1. Go to: [https://accounts.klei.com/account/game/servers?game=DontStarveTogether](https://accounts.klei.com/account/game/servers?game=DontStarveTogether)
 2. Create a server and download `MyDediServer.zip`.
 3. Extract it.
-4. Place all extracted files into `./data/MyDediServer`.
+4. Place all extracted files into `./data`.
 
 The container expects the standard Klei layout (clusters/worlds) inside `./data`.
 
