@@ -32,7 +32,7 @@ Bind the extracted config folder to the expected path inside the container:
 
 ```sh
 podman create -ti --name dst-server \
-  -v ./data:/root/.klei/DoNotStarveTogether/MyDediServer \
+  -v ./data:/root/.klei/DoNotStarveTogether/MyDediServer:z \
   localhost/dst:latest
 ```
 
