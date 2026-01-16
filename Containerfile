@@ -10,7 +10,6 @@ COPY ./scripts/bootstrap.sh /root/bootstrap.sh
 RUN chmod +x /root/bootstrap.sh
 
 # Create game dir
-RUN mkdir -p /srv/hytale
 WORKDIR /srv/data
 
 ENTRYPOINT [ "/root/bootstrap.sh" ]
