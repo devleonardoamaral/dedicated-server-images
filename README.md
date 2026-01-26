@@ -40,4 +40,5 @@ podman logs -f zomboid-server
 ```
 
 ## Notes
+
 - Port fowarding is required to the server be visible publicly.
