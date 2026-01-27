@@ -54,7 +54,7 @@ install_mods () {
     CFG_FILE="$DATA_DIR/Server/servertest.ini"
 
     echo "BOOTSTRAP: verifying mods ..." 
-    if [ ! -d "$MODS_DIR" ]: then
+    if [ ! -d "$MODS_DIR" ]; then
         mkdir -p "$MODS_DIR"
     fi
 
