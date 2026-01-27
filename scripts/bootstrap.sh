@@ -50,7 +50,7 @@ install_mods () {
 
     MODS_DIR="$DATA_DIR/mods"
     MODS_FILE="$DATA_DIR/mods/mods.txt"
-    WOKSHOP_FILE="$DATA_DIR/mods/workshopitems.txt"
+    WORKSHOP_FILE="$DATA_DIR/mods/workshopitems.txt"
     CFG_FILE="$DATA_DIR/Server/servertest.ini"
 
     echo "BOOTSTRAP: verifying mods ..." 
@@ -64,8 +64,8 @@ install_mods () {
     fi
 
     echo "BOOTSTRAP: verifying 'workshopitems.txt' ..."
-    if [ ! -e "$WOKSHOP_FILE" ]; then
-        touch "$WOKSHOP_FILE"
+    if [ ! -e "$WORKSHOP_FILE" ]; then
+        touch "$WORKSHOP_FILE"
     fi
 
     echo "BOOTSTRAP: updating mods ..."
@@ -74,7 +74,6 @@ install_mods () {
         option_mods="$(join_file_lines "$MODS_FILE" '\' "" ";")"
         option_mods="$(escape_sed_regex_chars "$option_mods")"
     fi
-    echo "$option_mods"
     sed -r -i 's/^Mods=[^$]*/Mods='"$option_mods"'/g' "$CFG_FILE"
 
     echo "BOOTSTRAP: updating workshopitems ..."
