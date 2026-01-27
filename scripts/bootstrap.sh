@@ -48,23 +48,30 @@ install_defaults() {
 install_mods () {
     echo "BOOTSTRAP: installing mods ..."
 
+    MODS_DIR="$DATA_DIR/mods"
+    MODS_FILE="$DATA_DIR/mods/mods.txt"
+    WOKSHOP_FILE="$DATA_DIR/mods/workshopitems.txt"
+    CFG_FILE="$DATA_DIR/Server/servertest.ini"
+
+    echo "BOOTSTRAP: verifying mods ..." 
+    if [ ! -d "$MODS_DIR" ]: then
+        mkdir -p "$MODS_DIR"
+    fi
+
     echo "BOOTSTRAP: verifying 'mods.txt' ..."
-    if [ ! -e "$DATA_DIR/mods.txt" ]; then
-        touch "$DATA_DIR/mods.txt"
+    if [ ! -e "$MODS_FILE" ]; then
+        touch "$MODS_FILE"
     fi
 
     echo "BOOTSTRAP: verifying 'workshopitems.txt' ..."
-    if [ ! -e "$DATA_DIR/workshopitems.txt" ]; then
-        touch "$DATA_DIR/workshopitems.txt"
+    if [ ! -e "$WOKSHOP_FILE" ]; then
+        touch "$WOKSHOP_FILE"
     fi
-
-    echo "BOOTSTRAP: verifying mods ..."
-    CFG_FILE="$DATA_DIR/Server/servertest.ini"
 
     echo "BOOTSTRAP: updating mods ..."
     option_mods=""
-    if [ -n "$(cat "$DATA_DIR/mods.txt")" ]; then
-        option_mods="$(join_file_lines "$DATA_DIR/mods.txt" '\' "" ";")"
+    if [ -n "$(cat "$MODS_FILE")" ]; then
+        option_mods="$(join_file_lines "$MODS_FILE" '\' "" ";")"
         option_mods="$(escape_sed_regex_chars "$option_mods")"
     fi
     echo "$option_mods"
@@ -72,8 +79,8 @@ install_mods () {
 
     echo "BOOTSTRAP: updating workshopitems ..."
     option_workshopitems=""
-    if [ -n "$(cat "$DATA_DIR/workshopitems.txt")" ]; then
-        option_workshopitems="$(join_file_lines "$DATA_DIR/workshopitems.txt" "" "" ";")"
+    if [ -n "$(cat "$WORKSHOP_FILE")" ]; then
+        option_workshopitems="$(join_file_lines "$WORKSHOP_FILE" "" "" ";")"
         option_workshopitems="$(escape_sed_regex_chars "$option_workshopitems")"
     fi
     sed -r -i 's/^WorkshopItems=[^$]*/WorkshopItems='"$option_workshopitems"'/g' "$CFG_FILE"
