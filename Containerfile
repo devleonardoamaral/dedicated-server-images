@@ -2,7 +2,7 @@ FROM debian:stable-slim
 
 # Install download tools
 RUN apt-get update \
-    && apt-get install -y curl unzip \
+    && apt-get install -y curl unzip tmux \
     && rm -rf /var/lib/apt/lists/*
 
 COPY ./defaults/serverconfig.txt /root/defaults/serverconfig.txt

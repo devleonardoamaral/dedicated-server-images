@@ -24,4 +24,14 @@ podman start terraria-server
 
 ## Stop Container
 
-Run `exit` command on server console.
+```bash
+podman exec -it terraria-server tmux send-keys -t terraria:0.0 "exit" Enter
+```
+
+## Attatch console
+
+```bash
+podman exec -it terraria-server tmux attach -t terraria
+```
+
+> Use `CTRL-B Q` to detach from the console.

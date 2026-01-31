@@ -32,7 +32,18 @@ if [ ! -e "/root/config/serverconfig.txt" ]; then
 fi
 
 echo "BOOTSTRAP: starting server ..."
-"$INSTALL_DIR/$VERSION/Linux/TerrariaServer.bin.x86_64" -config '/root/config/serverconfig.txt'
+
+tmux new -d -s terraria \
+  "$INSTALL_DIR/$VERSION/Linux/TerrariaServer.bin.x86_64 -config /root/config/serverconfig.txt" 
+  
+PANE=$(tmux list-panes -t terraria -F '#{pane_id}')
+
+tmux pipe-pane -t "$PANE" 'cat > /proc/1/fd/1'
+trap "tmux send-keys -t $PANE exit Enter" SIGTERM
+
+while tmux has-session -t terraria 2>/dev/null; do
+  sleep 1
+done
 
 echo ""
 echo "BOOTSTRAP: server exited with $?."
