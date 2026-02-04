@@ -72,14 +72,20 @@ exit
 
 ## Volumes
 
-```yaml
-volumes:
-  - ./data:/opt/Terraria/worlds:U
+The Terraria server stores worlds and backups in a host directory mounted into the container:
+
+```bash
+mkdir -p ./data
 ```
 
-- `./data` is the host directory where worlds and backup files are stored.
-- It can be changed to any path, but it **must be readable and writable by the container user**.
-- `:U` is Podman-specific and automatically adjusts ownership. For Docker, remove `:U` and handle permissions manually.
+```yaml
+volumes:
+  - ./data:/opt/Terraria/worlds:Z
+```
+
+- `./data` is the host directory for world files and backups.
+- You can change it to any path. Since the container runs as **root**, no UID/GID adjustment is required.
+- The `:Z` flag ensures SELinux labels allow the container to read/write the volume.
 
 ---
 
