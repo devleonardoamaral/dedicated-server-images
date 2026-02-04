@@ -6,7 +6,6 @@ Containerized setup for running a **Terraria Dedicated Server** using Podman or 
 
 ## Features
 
-- Rootless container user (configurable UID/GID)
 - Automatic world creation
 - Configurable server language, max players, password, and Journey mode permissions
 - Persistent volumes for worlds
@@ -21,7 +20,6 @@ Set server parameters via build arguments in `compose.yml`:
 | Argument         | Default                            |
 | ---------------- | ---------------------------------- |
 | VERSION          | 1453                               |
-| UID/GID          | 1000/1000                          |
 | LANG             | en-US                              |
 | WORLD_NAME       | world1                             |
 | WORLD_SIZE       | 2                                  |
@@ -79,9 +77,8 @@ volumes:
   - ./data:/opt/Terraria/worlds:U
 ```
 
-- `./data` is the host directory where worlds and save files are stored.
+- `./data` is the host directory where worlds and backup files are stored.
 - It can be changed to any path, but it **must be readable and writable by the container user**.
-- The container UID and GID should **match the host user** that accesses the folder to ensure proper permissions.
 - `:U` is Podman-specific and automatically adjusts ownership. For Docker, remove `:U` and handle permissions manually.
 
 ---

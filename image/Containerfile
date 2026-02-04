@@ -2,8 +2,6 @@ FROM debian:trixie-slim
 
 # Build-time parameters used to generate server configuration
 ARG VERSION=1453
-ARG UID=1000
-ARG GID=1000
 ARG LANG=en-US
 ARG WORLD_NAME=world1
 ARG WORLD_SIZE=2
@@ -34,10 +32,6 @@ ARG JOURNEY_SETDIFFICULTY=2
 ARG JOURNEY_BIOMESPREAD_SETFROZEN=2
 ARG JOURNEY_SETSPAWNRATE=2
 
-# Create a non-root user to run the server
-RUN groupadd -g ${GID} terraria \
- && useradd -m -u ${UID} -g ${GID} terraria
-
 # Install dependencies
 RUN apt-get update \
  && apt-get install -y unzip \
@@ -56,7 +50,7 @@ RUN unzip /tmp/terraria.zip -d /tmp/terraria \
  && rm -rf /tmp/terraria /tmp/terraria.zip
 
 # Copy default server configuration file into the image
-COPY --chown=terraria:terraria default/serverconfig.txt \
+COPY default/serverconfig.txt \
     /opt/Terraria/config/serverconfig.txt
 
 # Configure server language
@@ -101,14 +95,7 @@ RUN sed -ri "s|^journeypermission_time_setfrozen=.*|journeypermission_time_setfr
  && sed -ri "s|^journeypermission_biomespread_setfrozen=.*|journeypermission_biomespread_setfrozen=${JOURNEY_BIOMESPREAD_SETFROZEN}|" /opt/Terraria/config/serverconfig.txt \
  && sed -ri "s|^journeypermission_setspawnrate=.*|journeypermission_setspawnrate=${JOURNEY_SETSPAWNRATE}|" /opt/Terraria/config/serverconfig.txt
 
-# Set ownership and permissions for runtime directories
-RUN chown -R ${UID}:${GID} /opt/Terraria
-RUN chmod 755 /opt/Terraria \
- && chmod 755 /opt/Terraria/server \
- && chmod 775 /opt/Terraria/config
-
 # Configure container runtime context
-USER terraria
 WORKDIR /opt/Terraria
 
 # Use the entrypoint script

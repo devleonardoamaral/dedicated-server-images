@@ -6,10 +6,6 @@ services:
         # Terraria server version (e.g. 1453 = 1.4.5.3)
         # VERSION: 1453
 
-        # UID/GID used inside the container (must match host volume permissions)
-        # UID: 1000
-        # GID: 1000
-
         # Sets the server language from its language code
         # English = en-US
         # German = de-DE
