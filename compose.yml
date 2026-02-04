@@ -81,11 +81,8 @@ services:
       - "7777:7777"
 
     volumes:
-      # World storage directory (must be writable by UID/GID)
-      # NOTE: The :U suffix is a Podman-specific mount option (idmap / chown on mount).
-      # It is NOT supported by Docker and will cause errors if used with Docker.
-      # When using Docker, remove the :U suffix and ensure permissions are handled on the host.
-      - ./data:/opt/Terraria/worlds:U
+      # World storage directory
+      - ./data:/opt/Terraria/worlds:Z
 
     # Always restart the server unless explicitly stopped
     restart: always
