@@ -1,37 +1,99 @@
 # Terraria Dedicated Server
 
-## Build Image
+Containerized setup for running a **Terraria Dedicated Server** using Podman or Docker with persistent worlds and configurable settings.
+
+---
+
+## Features
+
+- Rootless container user (configurable UID/GID)
+- Automatic world creation
+- Configurable server language, max players, password, and Journey mode permissions
+- Persistent volumes for worlds
+- Interactive server console for safe shutdown
+
+---
+
+## Configuration
+
+Set server parameters via build arguments in `compose.yml`:
+
+| Argument         | Default                            |
+| ---------------- | ---------------------------------- |
+| VERSION          | 1453                               |
+| UID/GID          | 1000/1000                          |
+| LANG             | en-US                              |
+| WORLD_NAME       | world1                             |
+| WORLD_SIZE       | 2                                  |
+| WORLD_SEED       | AwesomeSeed                        |
+| WORLD_DIFFICULTY | 2                                  |
+| MAX_PLAYERS      | 6                                  |
+| PASSWORD         | password                           |
+| MOTD             | Please don’t cut the purple trees! |
+| SECURE           | 1                                  |
+| UPNP             | 0                                  |
+| NPCSTREAM        | 60                                 |
+| PRIORITY         | 1                                  |
+| JOURNEY_*        | 2 (everyone)                       |
+
+---
+
+## Build and Start
 
 ```bash
-podman build --tag terraria:latest --format docker .
+podman compose -f ./compose.yml up -d
 ```
 
-## Create Container
+Exposes port `7777` and mounts `./data` as world storage.
+
+---
+
+## Access Server Console
 
 ```bash
-podman create -it --name terraria-server \
-    -p 7777:7777/tcp \
-    -v ./data/worlds/:/root/.local/share/Terraria/Worlds/:z \
-    -v ./data/config/:/root/config/:z \
-    terraria:latest "$GAME_VERSION"
+podman attach dedicated-server-containers_terraria-server_1
 ```
 
-## Start Container
+- Type commands like `save` or `exit`.
+- Detach without stopping container: `Ctrl+P` then `Ctrl+Q`.
 
-```bash
-podman start terraria-server
+---
+
+## Stop Server Safely
+
+1. Attach to console (see above)
+2. Type:
+
+```text
+exit
 ```
 
-## Stop Container
+> ⚠️ **WARNING:** avoid `SIGKILL` or `podman stop` without `exit`, because the world may not save.
 
-```bash
-podman exec -it terraria-server tmux send-keys -t terraria:0.0 "exit" Enter
+---
+
+## Volumes
+
+```yaml
+volumes:
+  - ./data:/opt/Terraria/worlds:U
 ```
 
-## Attatch console
+- `./data` is the host directory where worlds and save files are stored.
+- It can be changed to any path, but it **must be readable and writable by the container user**.
+- The container UID and GID should **match the host user** that accesses the folder to ensure proper permissions.
+- `:U` is Podman-specific and automatically adjusts ownership. For Docker, remove `:U` and handle permissions manually.
 
-```bash
-podman exec -it terraria-server tmux attach -t terraria
+---
+
+## Ports
+
+```yaml
+ports:
+  - "7777:7777"  # Host:Container
 ```
 
-> Use `CTRL-B Q` to detach from the console.
+- The Terraria server listens on port `7777` inside the container.
+- The first number (`7777`) is the host port players connect to.
+- The second number (`7777`) is the container’s internal port.
+- This forwards traffic from the host to the container, making the server reachable from the network.
