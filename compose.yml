@@ -1,6 +1,6 @@
 services:
   terraria-server:
-    build: 
+    build:
       context: ./image
       args:
         # Terraria server version (e.g. 1453 = 1.4.5.3)
