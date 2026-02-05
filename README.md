@@ -1,25 +1,33 @@
 # Terraria Dedicated Server
 
-Containerized setup for running a **Terraria Dedicated Server** using Podman or Docker with persistent worlds and configurable settings.
-
----
+Containerized setup for running a **Terraria Dedicated Server** using Podman or Docker, with persistent worlds and configurable settings.
 
 ## Features
 
-- Automatic world creation
-- Configurable server language, max players, password, and Journey mode permissions
-- Persistent volumes for worlds
-- Interactive server console for safe shutdown
+* Automatic world creation
+* Fully configurable server settings during image build
+* Persistent volume for worlds and backups
 
 ---
 
-## Configuration
+## Server Setup
+
+To run the server, you need to configure the persistent data volume and server parameters.
+
+### Configuration
 
 Set server parameters via build arguments in `compose.yml`:
+
+```bash
+nano compose.yml
+```
+
+Default parameters:
 
 | Argument         | Default                            |
 | ---------------- | ---------------------------------- |
 | VERSION          | 1453                               |
+| UID/GID          | 1000/1000                          |
 | LANG             | en-US                              |
 | WORLD_NAME       | world1                             |
 | WORLD_SIZE       | 2                                  |
@@ -34,69 +42,98 @@ Set server parameters via build arguments in `compose.yml`:
 | PRIORITY         | 1                                  |
 | JOURNEY_*        | 2 (everyone)                       |
 
----
+### Volume
 
-## Build and Start
+To set up a persistent data volume, you need to adjust host directory permissions so the container can access it. If you add a pre-existing world, make sure its files have the same permissions.
+
+First, ensure the directory and its contents are owned by the user running the container:
 
 ```bash
-podman compose -f ./compose.yml up -d
+chown -R $(id -ur):$(id -g) data
 ```
 
-Exposes port `7777` and mounts `./data` as world storage.
+Then, grant read/write permissions to the directory and its contents:
 
----
+```bash
+chmod -R 770 data
+```
 
-## Access Server Console
+Define the SELinux context if necessary:
+
+```bash
+chcon -R -t container_file_t data
+```
+
+Set the volume in `compose.yml`:
+
+```bash
+nano compose.yml
+```
+
+```yml
+volumes:
+  - ./data:/opt/Terraria/worlds:rw,U
+```
+
+> 💡 The `:rw` flag sets the read-write permission.
+> 💡 The `:U` is specific to Podman, remove it for Docker.
+
+### Ports
+
+Internally, the container exposes port `7777/udp`. To allow players to connect, map the port to the host and forward it through your network:
+
+```bash
+nano compose.yml
+```
+
+```yml
+ports:
+  # "Host:Container/protocol"
+  - "7777:7777/udp"
+```
+
+### Starting
+
+```bash
+podman compose up -d
+```
+
+### Accessing Console
 
 ```bash
 podman attach dedicated-server-containers_terraria-server_1
 ```
 
-- Type commands like `save` or `exit`.
-- Detach without stopping container: `Ctrl+P` then `Ctrl+Q`.
+* Type commands like `save` or `exit`.
+* Detach without stopping the container: `Ctrl+P` then `Ctrl+Q`.
 
----
+### Stopping Safely
 
-## Stop Server Safely
-
-1. Attach to console (see above)
+1. Attach to the console (see above)
 2. Type:
 
 ```text
 exit
 ```
 
-> ⚠️ **WARNING:** avoid `SIGKILL` or `podman stop` without `exit`, because the world may not save.
+> ⚠️ **WARNING:** Avoid using `SIGKILL` or `podman stop` without exiting first, as the world may not save properly.
 
----
+### Logs
 
-## Volumes
-
-The Terraria server stores worlds and backups in a host directory mounted into the container:
+To view the server logs, use:
 
 ```bash
-mkdir -p ./data
+podman compose logs
 ```
 
-```yaml
-volumes:
-  - ./data:/opt/Terraria/worlds:Z
+To follow the logs in real-time, add the `-f` flag:
+
+```bash
+podman compose logs -f
 ```
 
-- `./data` is the host directory for world files and backups.
-- You can change it to any path. Since the container runs as **root**, no UID/GID adjustment is required.
-- The `:Z` flag ensures SELinux labels allow the container to read/write the volume.
+To display only the most recent lines, use `--tail`:
 
----
-
-## Ports
-
-```yaml
-ports:
-  - "7777:7777"  # Host:Container
+```bash
+podman compose logs --tail 50
 ```
-
-- The Terraria server listens on port `7777` inside the container.
-- The first number (`7777`) is the host port players connect to.
-- The second number (`7777`) is the container’s internal port.
-- This forwards traffic from the host to the container, making the server reachable from the network.
