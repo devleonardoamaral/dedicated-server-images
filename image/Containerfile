@@ -32,6 +32,12 @@ ARG JOURNEY_SETDIFFICULTY=2
 ARG JOURNEY_BIOMESPREAD_SETFROZEN=2
 ARG JOURNEY_SETSPAWNRATE=2
 
+# Create non-root user and group to run the server
+ARG UID=1000
+ARG GID=1000
+RUN groupadd -g ${GID} terraria \
+ && useradd -u ${UID} -g ${GID} -m terraria
+
 # Install dependencies
 RUN apt-get update \
  && apt-get install -y unzip \
@@ -46,11 +52,10 @@ ADD https://terraria.org/api/download/pc-dedicated-server/terraria-server-${VERS
 # Extract server binaries and clean temporary files
 RUN unzip /tmp/terraria.zip -d /tmp/terraria \
  && mv /tmp/terraria/${VERSION}/Linux/* /opt/Terraria/server \
- && chmod +x /opt/Terraria/server/TerrariaServer.bin.x86_64 \
  && rm -rf /tmp/terraria /tmp/terraria.zip
 
 # Copy default server configuration file into the image
-COPY default/serverconfig.txt \
+COPY serverconfig.txt \
     /opt/Terraria/config/serverconfig.txt
 
 # Configure server language
@@ -95,9 +100,24 @@ RUN sed -ri "s|^journeypermission_time_setfrozen=.*|journeypermission_time_setfr
  && sed -ri "s|^journeypermission_biomespread_setfrozen=.*|journeypermission_biomespread_setfrozen=${JOURNEY_BIOMESPREAD_SETFROZEN}|" /opt/Terraria/config/serverconfig.txt \
  && sed -ri "s|^journeypermission_setspawnrate=.*|journeypermission_setspawnrate=${JOURNEY_SETSPAWNRATE}|" /opt/Terraria/config/serverconfig.txt
 
-# Configure container runtime context
-WORKDIR /opt/Terraria
+# Set permissions
+RUN chown -R terraria:terraria /opt/Terraria \
+ && chmod 755 /opt/Terraria \
+ && chmod 755 /opt/Terraria/config \
+ && chmod 644 /opt/Terraria/config/* \
+ && chmod 755 /opt/Terraria/server \
+ && chmod 644 /opt/Terraria/server/* \
+ && chmod 755 /opt/Terraria/server/TerrariaServer.bin.x86_64 \
+ && chmod 755 /opt/Terraria/server/lib64 \
+ && chmod 644 /opt/Terraria/server/lib64/*
 
-# Use the entrypoint script
+# Configure container context
+WORKDIR /opt/Terraria
+USER terraria
+
+# Expose default Terraria server port
+EXPOSE 7777/udp
+
+# Define entrypoint and default command
 ENTRYPOINT ["./server/TerrariaServer.bin.x86_64"]
 CMD ["-config", "/opt/Terraria/config/serverconfig.txt"]

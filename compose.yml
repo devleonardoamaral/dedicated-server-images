@@ -6,6 +6,9 @@ services:
         # Terraria server version (e.g. 1453 = 1.4.5.3)
         # VERSION: 1453
 
+        GID: 1000
+        UID: 1000
+
         # Sets the server language from its language code
         # English = en-US
         # German = de-DE
@@ -77,12 +80,12 @@ services:
 
     ports:
       # Terraria server port
-      # "Host:Container"
-      - "7777:7777"
+      # "Host:Container/protocol"
+      - "7777:7777/udp"
 
     volumes:
       # World storage directory
-      - ./data:/opt/Terraria/worlds:Z
+      - ./data:/opt/Terraria/worlds:rw,U
 
     # Always restart the server unless explicitly stopped
     restart: always
