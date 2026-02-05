@@ -58,12 +58,6 @@ Then, grant read/write permissions to the directory and its contents:
 chmod -R 770 data
 ```
 
-Define the SELinux context if necessary:
-
-```bash
-chcon -R -t container_file_t data
-```
-
 Set the volume in `compose.yml`:
 
 ```bash
@@ -77,6 +71,7 @@ volumes:
 
 > 💡 The `:rw` flag sets the read-write permission.
 > 💡 The `:U` is specific to Podman, remove it for Docker.
+> 💡 The `:Z` is required instead of `:U` in environments using SELinux.
 
 ### Ports
 
